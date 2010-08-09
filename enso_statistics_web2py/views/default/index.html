@@ -52,101 +52,101 @@ div.candywrap {
 
 /* --- Window */
 #infowindow{
-	min-width: 624px;
-	min-height: 328px;
-	background-color: #dddddd;
-	padding: 3px;
+    min-width: 624px;
+    min-height: 328px;
+    background-color: #dddddd;
+    padding: 3px;
 }
 
 /* --- Observations buttons */
 #observations{
-	width: 100%;
-	height: 28px;
-	padding: 3px;
+    width: 100%;
+    height: 28px;
+    padding: 3px;
 }
 .obsv_button{
-	outline: 0; 
-	margin:0 4px 0 0; 
-	padding: 1px; 
-	text-decoration:none !important; 
-	cursor:pointer; 
-	position: relative; 
-	text-align: center; 
-	zoom: 1;
-	/*font-weight: bold;*/
+    outline: 0; 
+    margin:0 4px 0 0; 
+    padding: 1px; 
+    text-decoration:none !important; 
+    cursor:pointer; 
+    position: relative; 
+    text-align: center; 
+    zoom: 1;
+    /*font-weight: bold;*/
 }
 
 /* --- Stats tabs */
 ul#stats_tabs.tabs {
-	/* --- Generic */
-	/* Remove all spacings from the list items */
-	margin: 0 !important;
-	padding: 0;
-	list-style-type: none;
-	/*padding-left = wrapper.border-radius*/
-	padding-top: 6px;
-	padding-left: 9px;
-	/* --- Specific to #stats-tabs*/
-	height: 18pt;
-	border-top: none;
+    /* --- Generic */
+    /* Remove all spacings from the list items */
+    margin: 0 !important;
+    padding: 0;
+    list-style-type: none;
+    /*padding-left = wrapper.border-radius*/
+    padding-top: 6px;
+    padding-left: 9px;
+    /* --- Specific to #stats-tabs*/
+    height: 18pt;
+    border-top: none;
 }
 ul#stats_tabs.tabs li{
-	/* --- Generic */
-	float: left;
-	margin: 0pt;
-	line-style-type: none;
-	/* --- Specific to #stats-tabs */
-	height: 18pt;
-	line-height: 18pt;
-	width: auto;
-	min-width: 24pt;
-	font: 8pt "Lucida Grande", Lucida, Verdana, sans-serif; 
-	font-weigth: 700;
-	
+    /* --- Generic */
+    float: left;
+    margin: 0pt;
+    line-style-type: none;
+    /* --- Specific to #stats-tabs */
+    height: 18pt;
+    line-height: 18pt;
+    width: auto;
+    min-width: 24pt;
+    font: 8pt "Lucida Grande", Lucida, Verdana, sans-serif; 
+    font-weigth: 700;
+    
 }
 ul#stats_tabs.tabs a {
     /* --- Generic */
-	float:  left;
-	display: block;
-	position: relative;
-	/* --- Specific */
-	padding: 3pt 6pt;
-	padding-bottom: 0;
-	height: 11.5pt;
-	text-indent: 0;
-	text-decoration: none;
-	-moz-border-radius-topleft: 6px;
-	-moz-border-radius-topright: 6px;
-	-webkit-border-top-left-radius: 6px;
-	-webkit-border-top-right-radius: 6px;
-	border: 1px solid black;
-	border-bottom: 0px sold white;
-	/*Space between tabs */
-	margin-bottom: 0px;
-	margin-right: 3pt;
-	background-color:#ccc;
-	color:#777;
+    float:  left;
+    display: block;
+    position: relative;
+    /* --- Specific */
+    padding: 3pt 6pt;
+    padding-bottom: 0;
+    height: 11.5pt;
+    text-indent: 0;
+    text-decoration: none;
+    -moz-border-radius-topleft: 6px;
+    -moz-border-radius-topright: 6px;
+    -webkit-border-top-left-radius: 6px;
+    -webkit-border-top-right-radius: 6px;
+    border: 1px solid black;
+    border-bottom: 0px sold white;
+    /*Space between tabs */
+    margin-bottom: 0px;
+    margin-right: 3pt;
+    background-color:#ccc;
+    color:#777;
 }
 #stats_tabs a:hover {
-	background-color:#ccc;
-	color:#37738c;
-	cursor: pointer;
+    background-color:#ccc;
+    color:#37738c;
+    cursor: pointer;
 }
 #stats_tabs a:active {
-	color: #37738c;
-	background-color: #fff;
-	cursor: pointer;
+    color: #37738c;
+    background-color: #fff;
+    cursor: pointer;
 }
 #stats_tabs li.current > a {
-	color: #37738c;
-	background-color: #fff;
-	border-bottom: 1px solid #fff;
-	z-index: 10;
+    color: #37738c;
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
+    z-index: 10;
 }
 
 #stats_panels{
-	padding: 3px;
-	padding-bottom: 6px;
+    padding: 3px;
+    padding-bottom: 6px;
 };
 
 /* --- Graph/text panels */
@@ -179,30 +179,30 @@ var connected = false;
 
 
 function log_error(msg){
-	// Log the errors to the text panel
-	// msg: a string corresponding to the error message
-	$("#text_panel").append("<br/>"+msg);
-	$("#text_panel").show();
-	$("#graph_panel").hide();
+    // Log the errors to the text panel
+    // msg: a string corresponding to the error message
+    $("#text_panel").append("<br/>"+msg);
+    $("#text_panel").show();
+    $("#graph_panel").hide();
 };
 
 
 function log_message(msg){
-	// Log the errors to the text panel
-	// msg: a string corresponding to the error message
-	$("#status_panel").append("<br/>"+msg);
-	console.log(msg);
+    // Log the errors to the text panel
+    // msg: a string corresponding to the error message
+    $("#status_panel").append("<br/>"+msg);
+    console.log(msg);
 };
 
 
 
 function initialize_DataConnection() {
-	// Initialize the connection to the server
+    // Initialize the connection to the server
     connected = false;
     // Get the URL of the JSONRPC data server (web2py syntax)
     var url = "{{=URL(r=request, f='call/jsonrpc')}}";
     try {
-	    // Try to connect to the server and build the service object
+        // Try to connect to the server and build the service object
         DataController = new rpc.ServiceProxy(url);
         connected = true;
     } catch(err) {
@@ -222,18 +222,18 @@ function load_infowindow(coopid){
 
 
 function initialize(){
-	// Set the default option in the radius selector
-	$("#radius_selector").val(50);
-	// Initialize the geocoder
-	geocoder = new google.maps.Geocoder();
-	// Initialize the infowindow (in infowindow.js)
+    // Set the default option in the radius selector
+    $("#radius_selector").val(50);
+    // Initialize the geocoder
+    geocoder = new google.maps.Geocoder();
+    // Initialize the infowindow (in infowindow.js)
     initialize_infowindow();
-	// Initialize the map (in station_markers.js)
+    // Initialize the map (in station_markers.js)
     initialize_map();
 };
 
 $(document).ready(function(){
-	initialize();
+    initialize();
 });
 
 </script>
@@ -242,28 +242,28 @@ $(document).ready(function(){
 <br/>
 
 <div id="station_selector">
-	<strong>Enter an address or zipcode </strong> 
-	<input id="zipcode" type="textbox" onkeypress="zipcode_keypress(event)"/>
-	<br/>
-	<strong>Choose a search radius (mi) </strong>
-	<select id="radius_selector" onChange="reset_radius()">
-	    <option>   10</option>
-	    <option>   25</option>
-	    <option>   50</option>
-	    <option>   75</option>
-	    <option>  100</option>
-	    <option>  125</option>
-	    <option>  150</option>
-	    <option>  200</option>
-	    <option>  250</option>
-	</select>
-	<br/>
-	<strong>Press </strong><input type="button" value="Select" class="ui-state-default ui-corner-all" onClick="select_markers()"/>
+    <strong>Enter an address or zipcode </strong> 
+    <input id="zipcode" type="textbox" onkeypress="zipcode_keypress(event)"/>
+    <br/>
+    <strong>Choose a search radius (mi) </strong>
+    <select id="radius_selector" onChange="reset_radius()">
+        <option>   10</option>
+        <option>   25</option>
+        <option>   50</option>
+        <option>   75</option>
+        <option>  100</option>
+        <option>  125</option>
+        <option>  150</option>
+        <option>  200</option>
+        <option>  250</option>
+    </select>
+    <br/>
+    <strong>Press </strong><input type="button" value="Select" class="ui-state-default ui-corner-all" onClick="select_markers()"/>
 </div>
 
 
 <div id="status_panel">
-	
+    
 </div>
 
 <div id="basemap_frame" class="candywrap">
@@ -282,14 +282,21 @@ $(document).ready(function(){
     </div>   
     <!--    -->
     <div id="stats">
-		<ul id="stats_tabs" class="tabs">
-			<li id="tab_averages"><a>Averages/Anomalies</a></li>
-			<li id="tab_distribution"><a>Distribution</a></li>
-			<li id="tab_exceedance"><a>Exceedance</a></li>
-			<li id="tab_series"><a>Series</a></li>
-			<li id="tab_extras"><a>Extra configuration</a></li>
-		</ul>
+        <ul id="stats_tabs" class="tabs">
+            <li id="tab_averages"><a>Averages/Anomalies</a></li>
+            <li id="tab_distribution"><a>Distribution</a></li>
+            <li id="tab_exceedance"><a>Exceedance</a></li>
+            <li id="tab_series"><a>Series</a></li>
+            <!-- <li id="tab_extras"><a>Extra configuration</a></li> -->
+        </ul>
         <div id="panel_averages" class="stats_panels">
+            <strong>Period</strong>
+            <select id="ddperiod" onchange="select_period()">
+                <option value="monthly">Monthly</option>
+                <option value="JFM">JFM/AMJ/JAS/OND</option>
+                <option value="DJF">DJF/MAM/JJA/SON</option>
+                <option value="NDJ">NDJ/FMA/MJJ/ASO</option>
+            </select>
             <strong>Baseline</strong>
             <select id="ddaverages" onchange="select_baseline()">
                 <option value="">None</option>
@@ -297,6 +304,12 @@ $(document).ready(function(){
                 <option value="C">La Niña</option>
                 <option value="N">Neutral</option>
                 <option value="W">El Niño</option>
+            </select>
+            <strong>ENSOI</strong>
+            <select id="ddensoi"  onchange="select_ensoi()">
+                <option>ONI</option>
+                <option>JMAI</option>
+                <option>MEI</option>
             </select>
         </div>
         <!-- -->
@@ -339,6 +352,7 @@ $(document).ready(function(){
         <div id="panel_series" class="stats_panels">
             SERIES
         </div>
+        <!--
         <div id="panel_extras" class="stats_panels">
             <strong>Period</strong>
             <select id="ddperiod" onchange="select_period()">
@@ -347,7 +361,7 @@ $(document).ready(function(){
                 <option value="DJF">DJF/MAM/JJA/SON</option>
                 <option value="NDJ">NDJ/FMA/MJJ/ASO</option>
             </select>
-            <!--            -->
+            <!--            --*>
             <strong>ENSOI</strong>
             <select id="ddensoi"  onchange="select_ensoi()">
                 <option>ONI</option>
@@ -355,6 +369,7 @@ $(document).ready(function(){
                 <option>MEI</option>
             </select>
         </div>
+        -->
     </div>
     <!--    -->
     <div id="graph_panel">
@@ -365,4 +380,3 @@ $(document).ready(function(){
         TEXT
     </div>
 </div>
-
