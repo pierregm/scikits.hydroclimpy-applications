@@ -1,0 +1,368 @@
+{{extend 'layout.html'}}
+{{import urllib}}
+
+<!-- Google Apps API-->
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<!-- Google Maps API -->
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+
+<!-- JQuery API -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js"></script>
+<script type="text/javascript" src="http://jquery-ui.googlecode.com/svn/tags/latest/external/bgiframe/jquery.bgiframe.min.js"></script>
+<link type="text/css" rel="stylesheet"  href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-lightness/jquery-ui.css" media="all" />
+
+
+
+<!-- JSON RPC -->
+<script type="text/javascript" src="{{=URL(r=request,c='static',f='rpc.js')}}"> </script>
+<!--
+<script type="text/javascript" src="{{=URL(r=request,c='static',f='dataconnection.js')}}"> </script>
+-->
+<script type="text/javascript"  src="{{=URL(r=request,c='static',f='infowindow.js')}}"> </script>
+<script type="text/javascript"  src="{{=URL(r=request,c='static',f='station_markers.js')}}"> </script>
+
+
+<style>
+div.candywrap {
+    padding: 9px;
+    background: #37738c;
+    color: #424242;
+    border: 1px solid #333;
+    -moz-border-radius: 9px;
+    -webkit-border-radius: 9px;
+    -moz-box-shadow: 3px 3px 3px #000;
+    -webkit-box-shadow: 3px 3px 3px #000;
+}
+
+#status_panel{
+    background-color: #ffffaf;
+    padding: 3px;
+    margin-bottom: 5px;
+    border: 1px dashed #000;
+}
+
+#map_canvas {
+    min-width: 636px;
+    min-height: 639px;    
+    padding: 3px;
+    border: 1px solid #797979;
+    background-color: #eaeaea;
+}
+
+/* --- Window */
+#infowindow{
+	min-width: 624px;
+	min-height: 328px;
+	background-color: #dddddd;
+	padding: 3px;
+}
+
+/* --- Observations buttons */
+#observations{
+	width: 100%;
+	height: 28px;
+	padding: 3px;
+}
+.obsv_button{
+	outline: 0; 
+	margin:0 4px 0 0; 
+	padding: 1px; 
+	text-decoration:none !important; 
+	cursor:pointer; 
+	position: relative; 
+	text-align: center; 
+	zoom: 1;
+	/*font-weight: bold;*/
+}
+
+/* --- Stats tabs */
+ul#stats_tabs.tabs {
+	/* --- Generic */
+	/* Remove all spacings from the list items */
+	margin: 0 !important;
+	padding: 0;
+	list-style-type: none;
+	/*padding-left = wrapper.border-radius*/
+	padding-top: 6px;
+	padding-left: 9px;
+	/* --- Specific to #stats-tabs*/
+	height: 18pt;
+	border-top: none;
+}
+ul#stats_tabs.tabs li{
+	/* --- Generic */
+	float: left;
+	margin: 0pt;
+	line-style-type: none;
+	/* --- Specific to #stats-tabs */
+	height: 18pt;
+	line-height: 18pt;
+	width: auto;
+	min-width: 24pt;
+	font: 8pt "Lucida Grande", Lucida, Verdana, sans-serif; 
+	font-weigth: 700;
+	
+}
+ul#stats_tabs.tabs a {
+    /* --- Generic */
+	float:  left;
+	display: block;
+	position: relative;
+	/* --- Specific */
+	padding: 3pt 6pt;
+	padding-bottom: 0;
+	height: 11.5pt;
+	text-indent: 0;
+	text-decoration: none;
+	-moz-border-radius-topleft: 6px;
+	-moz-border-radius-topright: 6px;
+	-webkit-border-top-left-radius: 6px;
+	-webkit-border-top-right-radius: 6px;
+	border: 1px solid black;
+	border-bottom: 0px sold white;
+	/*Space between tabs */
+	margin-bottom: 0px;
+	margin-right: 3pt;
+	background-color:#ccc;
+	color:#777;
+}
+#stats_tabs a:hover {
+	background-color:#ccc;
+	color:#37738c;
+	cursor: pointer;
+}
+#stats_tabs a:active {
+	color: #37738c;
+	background-color: #fff;
+	cursor: pointer;
+}
+#stats_tabs li.current > a {
+	color: #37738c;
+	background-color: #fff;
+	border-bottom: 1px solid #fff;
+	z-index: 10;
+}
+
+#stats_panels{
+	padding: 3px;
+	padding-bottom: 6px;
+};
+
+/* --- Graph/text panels */
+#graph_panel{
+    width: 100%;
+    min-width: 600px;
+    height: 300px;
+    background-color: #00fafa;
+    padding: 3px;
+}
+#text_panel{
+    width: 98%;
+    height: 300px;
+    border: 1px solid #000000;
+    padding: 3px 6px 3px 3px;
+    margin-right: 6px;
+}
+
+
+</style>
+
+
+
+<script type="text/javascript">
+
+// Define an empty DataController
+var DataController = null;
+// Set the connection flag
+var connected = false;
+
+
+function log_error(msg){
+	// Log the errors to the text panel
+	// msg: a string corresponding to the error message
+	$("#text_panel").append("<br/>"+msg);
+	$("#text_panel").show();
+	$("#graph_panel").hide();
+};
+
+
+function log_message(msg){
+	// Log the errors to the text panel
+	// msg: a string corresponding to the error message
+	$("#status_panel").append("<br/>"+msg);
+	console.log(msg);
+};
+
+
+
+function initialize_DataConnection() {
+	// Initialize the connection to the server
+    connected = false;
+    // Get the URL of the JSONRPC data server (web2py syntax)
+    var url = "{{=URL(r=request, f='call/jsonrpc')}}";
+    try {
+	    // Try to connect to the server and build the service object
+        DataController = new rpc.ServiceProxy(url);
+        connected = true;
+    } catch(err) {
+        // Something went wrong: make sure we get a message
+        log_error("<strong>Connection Error:</strong> " + err.message);
+        connected = false;
+    };
+};
+
+
+
+function load_infowindow(coopid){
+    $("#infowindow").dialog('open');
+    update_coopid(coopid);
+};
+
+
+
+function initialize(){
+	// Set the default option in the radius selector
+	$("#radius_selector").val(50);
+	// Initialize the geocoder
+	geocoder = new google.maps.Geocoder();
+	// Initialize the infowindow (in infowindow.js)
+    initialize_infowindow();
+	// Initialize the map (in station_markers.js)
+    initialize_map();
+};
+
+$(document).ready(function(){
+	initialize();
+});
+
+</script>
+
+<h1>SECC Water Group Climate tool.</h1>
+<br/>
+
+<div id="station_selector">
+	<strong>Enter an address or zipcode </strong> 
+	<input id="zipcode" type="textbox" onkeypress="zipcode_keypress(event)"/>
+	<br/>
+	<strong>Choose a search radius (mi) </strong>
+	<select id="radius_selector" onChange="reset_radius()">
+	    <option>   10</option>
+	    <option>   25</option>
+	    <option>   50</option>
+	    <option>   75</option>
+	    <option>  100</option>
+	    <option>  125</option>
+	    <option>  150</option>
+	    <option>  200</option>
+	    <option>  250</option>
+	</select>
+	<br/>
+	<strong>Press </strong><input type="button" value="Select" class="ui-state-default ui-corner-all" onClick="select_markers()"/>
+</div>
+
+
+<div id="status_panel">
+	
+</div>
+
+<div id="basemap_frame" class="candywrap">
+    <div id="map_canvas" style="width: 336px; height:339px">
+        (If all had gone well, you would be watching a map...)
+    </div>
+</div>
+
+
+<div id="infowindow">
+    <div id="observations">
+        <button id="info" class="ui-state-default ui-corner-all observation">Information</button>
+        <button id="rain" class="ui-state-default ui-corner-all observation">Precipitation</button>
+        <button id="tmin" class="ui-state-default ui-corner-all observation">Min. temperatures</button>
+        <button id="tmax" class="ui-state-default ui-corner-all observation">Max. temperatures</button>
+    </div>   
+    <!--    -->
+    <div id="stats">
+		<ul id="stats_tabs" class="tabs">
+			<li id="tab_averages"><a>Averages/Anomalies</a></li>
+			<li id="tab_distribution"><a>Distribution</a></li>
+			<li id="tab_exceedance"><a>Exceedance</a></li>
+			<li id="tab_series"><a>Series</a></li>
+			<li id="tab_extras"><a>Extra configuration</a></li>
+		</ul>
+        <div id="panel_averages" class="stats_panels">
+            <strong>Baseline</strong>
+            <select id="ddaverages" onchange="select_baseline()">
+                <option value="">None</option>
+                <option value="A">All years</option>
+                <option value="C">La Niña</option>
+                <option value="N">Neutral</option>
+                <option value="W">El Niño</option>
+            </select>
+        </div>
+        <!-- -->
+        <div id="panel_seasons" class="stats_panels">
+            <strong>Season</strong>
+            <select id="ddseason_monthly" onchange="select_season(this)">
+                <option value="jan">Jan</option>
+                <option value="feb">Feb</option>
+                <option value="mar">Mar</option>
+                <option value="apr">Apr</option>
+                <option value="may">May</option>
+                <option value="jun">Jun</option>
+                <option value="jul">Jul</option>
+                <option value="aug">Aug</option>
+                <option value="sep">Sep</option>
+                <option value="oct">Oct</option>
+                <option value="nov">Nov</option>
+                <option value="dec">Dec</option>
+            </select>
+            <select id="ddseason_JFM" onchange="select_season(this)">
+                <option value="JFM">JFM</option>
+                <option value="AMJ">AMJ</option>
+                <option value="JAS">JAS</option>
+                <option value="OND">OND</option>
+            </select>
+            <select id="ddseason_DJF" onchange="select_season(this)">
+                <option value="DJF">DJF</option>
+                <option value="MAM">MAM</option>
+                <option value="JJA">JJA</option>
+                <option value="SON">SON</option>
+            </select>
+            <select id="ddseason_NDJ" onchange="select_season(this)">
+                <option value="NDJ">NDJ</option>
+                <option value="FMA">FMA</option>
+                <option value="MJJ">MJJ</option>
+                <option value="ASO">ASO</option>
+            </select>
+        </div>
+        <!--        -->  
+        <div id="panel_series" class="stats_panels">
+            SERIES
+        </div>
+        <div id="panel_extras" class="stats_panels">
+            <strong>Period</strong>
+            <select id="ddperiod" onchange="select_period()">
+                <option value="monthly">Monthly</option>
+                <option value="JFM">JFM/AMJ/JAS/OND</option>
+                <option value="DJF">DJF/MAM/JJA/SON</option>
+                <option value="NDJ">NDJ/FMA/MJJ/ASO</option>
+            </select>
+            <!--            -->
+            <strong>ENSOI</strong>
+            <select id="ddensoi"  onchange="select_ensoi()">
+                <option>ONI</option>
+                <option>JMAI</option>
+                <option>MEI</option>
+            </select>
+        </div>
+    </div>
+    <!--    -->
+    <div id="graph_panel">
+        GRAPH
+    </div>
+    <!--    -->
+    <div id="text_panel" class="box">
+        TEXT
+    </div>
+</div>
+
